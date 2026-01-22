@@ -6,7 +6,6 @@ namespace Common
     public class Zadatak
     {
         public TipZadatka Tip { get; set; }
-        public int ApartmanId { get; set; }
 
         public Zadatak() { }
 
@@ -22,7 +21,6 @@ namespace Common
     {
         public int ApartmanId { get; set; }
         public TipZadatka Tip { get; set; }
-        public bool Uspesno { get; set; }
 
         public PotvrdaOUradjenomZadatku() { }
 
