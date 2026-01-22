@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Common/Common.csproj" Id="7eade2d1-0ec3-4bca-97c8-375478f1b3c6" />
+  <Project Path="Klijent Gost/Klijent Gost.csproj" Id="fa093555-8631-49cd-958e-f0f9db424468" />
+  <Project Path="Klijent Osoblje/Klijent Osoblje.csproj" Id="b73f8490-381e-453d-b2da-41e226d922fc" />
+  <Project Path="Server Aplikacija/Server Aplikacija.csproj" Id="28774ede-78cc-48c8-b8fa-66480fd50a1b" />
+</Solution>
