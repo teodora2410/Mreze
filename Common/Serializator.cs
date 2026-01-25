@@ -15,6 +15,18 @@ namespace Common
             }
         }
 
-      
+        public static T Deserialize<T>(byte[] data)
+        {
+            if (data == null || data.Length == 0)
+            {
+                return default;
+            }
+
+            using (MemoryStream ms = new MemoryStream(data))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                return (T)formatter.Deserialize(ms);
+            }
+        }
     }
 }
