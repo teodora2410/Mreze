@@ -17,6 +17,84 @@ namespace Klijent_Gost
             tcpSocket = socket;
         }
 
+        public void IzvrsiRezervaciju()
+        {
+            ZahtevKlijenta reqStatus = new ZahtevKlijenta
+            {
+                Tip = TipZahteva.StatusSobe,
+                Payload = null
+            };
+
+            tcpSocket.Send(MemorySerializer.Serialize(reqStatus));
+
+            byte[] buffer = new byte[8192];
+            int bytes = tcpSocket.Receive(buffer);
+            byte[] data = new byte[bytes];
+            Array.Copy(buffer, data, bytes);
+
+            List<Apartman> apartmani = MemorySerializer.Deserialize<List<Apartman>>(data);
+
+            if (apartmani.Count == 0)
+            {
+                Console.WriteLine("\nNema dostupnih apartmana.");
+                return;
+            }
+
+            PrikaziApartmane(apartmani);
+
+            Console.Write("\nREZERVACIJA SOBE");
+            Console.Write("\nUnesite zeljenu klasu sobe (1-3): ");
+            if (!int.TryParse(Console.ReadLine(), out int klasa) || klasa < 1 || klasa > 3)
+            {
+                Console.WriteLine("Nevalidna klasa.");
+                return;
+            }
+
+            Console.Write("Unesite broj gostiju: ");
+            if (!int.TryParse(Console.ReadLine(), out int brojGostiju) || brojGostiju < 1)
+            {
+                Console.WriteLine("Nevalidan broj gostiju.");
+                return;
+            }
+
+            Console.Write("Unesite broj noci boravka: ");
+            if (!int.TryParse(Console.ReadLine(), out int brojNoci) || brojNoci < 1)
+            {
+                Console.WriteLine("Nevalidan broj noci.");
+                return;
+            }
+
+            ZahtevZaRezervacijuApartmana rezervacija = new ZahtevZaRezervacijuApartmana
+            {
+                BrojGostiju = brojGostiju,
+                Klasa = klasa,
+                BrojNoci = brojNoci
+            };
+
+            ZahtevKlijenta zahtev = new ZahtevKlijenta
+            {
+                Tip = TipZahteva.Rezervacija,
+                Payload = rezervacija
+            };
+
+            tcpSocket.Send(MemorySerializer.Serialize(zahtev));
+
+            bytes = tcpSocket.Receive(buffer);
+            data = new byte[bytes];
+            Array.Copy(buffer, data, bytes);
+
+            string odgovor = MemorySerializer.Deserialize<string>(data);
+            Console.WriteLine($"\n{odgovor}");
+
+            if (odgovor == null || !odgovor.StartsWith("Rezervacija potvrđena"))
+            {
+                Console.WriteLine("Rezervacija nije uspela.");
+                return;
+            }
+
+            IDApartmana(odgovor);
+            UnosDetaljaBoravka(brojGostiju, brojNoci);
+        }
 
         private void PrikaziApartmane(List<Apartman> apartmani)
         {

@@ -39,5 +39,29 @@ namespace Klijent_Gost
             }
         }
 
+        public bool PrikaziGlavniMeni(Rezervacija rezervacijaManager)
+        {
+            Console.WriteLine("\n1. Rezervacija sobe");
+            Console.WriteLine("2. Odjava");
+            Console.Write("Izaberite opciju: ");
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Clear();
+                    rezervacijaManager.IzvrsiRezervaciju();
+                    return true;
+
+                case "2":
+                    Console.WriteLine("\nOdjava...");
+                    return false;
+
+                default:
+                    Console.Clear();
+                    Console.WriteLine("\nNepoznata opcija.");
+                    return true;
+            }
+        }
     }
 }
