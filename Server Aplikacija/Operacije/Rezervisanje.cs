@@ -37,6 +37,38 @@ namespace Server_Aplikacija.Operacije
                 brojNoci = 1;
             }
 
+            Apartman slobodan = null;
+            if (klasa > 0)
+                slobodan = apartmani.Find(a => a.Stanje == StanjeApartmana.Prazan && a.MaksimalanBrojGostiju >= brojGostiju && a.Klasa == klasa);
+            else
+                slobodan = apartmani.Find(a => a.Stanje == StanjeApartmana.Prazan && a.MaksimalanBrojGostiju >= brojGostiju);
+
+            string odgovor;
+            if (slobodan != null)
+            {
+                slobodan.TrenutniBrojGostiju = brojGostiju;
+                slobodan.Stanje = StanjeApartmana.Zauzet;
+
+                if (!aktivneRezervacije.ContainsKey(klijent))
+                {
+                    aktivneRezervacije[klijent] = new RezervacijaInfo();
+                }
+
+                aktivneRezervacije[klijent].Apartman = slobodan;
+                aktivneRezervacije[klijent].ApartmanId = slobodan.Id;
+                aktivneRezervacije[klijent].BrojNoci = brojNoci;
+
+                odgovor = $"Rezervacija potvrđena: Apartman {slobodan.BrojApartmana} {slobodan.Id}, Klasa {slobodan.Klasa}, Broj noći: {brojNoci}";
+                Console.WriteLine($"[Server] {odgovor}");
+            }
+            else
+            {
+                odgovor = "Nema slobodnih apartmana za zadate uslove";
+                Console.WriteLine($"[Server] {odgovor}");
+            }
+
+            byte[] data = MemorySerializer.Serialize(odgovor);
+            klijent.Send(data);
         }
     }
 }
