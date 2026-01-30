@@ -61,7 +61,36 @@ namespace Klijent_Gost
                 do
                 {
                     Console.Write("Ime: ");
-             ole.Write("Datum rodjenja (yyyy-MM-dd): ");
+                    ime = Console.ReadLine()?.Trim() ?? "";
+                    if (ime.Length < 2)
+                        Console.WriteLine("Ime mora imati bar 2 slova.");
+                }
+                while (ime.Length < 2);
+
+                string prezime;
+                do
+                {
+                    Console.Write("Prezime: ");
+                    prezime = Console.ReadLine()?.Trim() ?? "";
+                    if (prezime.Length < 2)
+                        Console.WriteLine("Prezime mora imati bar 2 slova.");
+                }
+                while (prezime.Length < 2);
+
+                string pol;
+                do
+                {
+                    Console.Write("Pol (M/Z): ");
+                    pol = (Console.ReadLine() ?? "").Trim().ToUpper();
+                    if (pol != "M" && pol != "Z")
+                        Console.WriteLine("Pol mora biti 'M' ili 'Z'.");
+                }
+                while (pol != "M" && pol != "Z");
+
+                DateTime datum;
+                do
+                {
+                    Console.Write("Datum rodjenja (yyyy-MM-dd): ");
                     if (!DateTime.TryParse(Console.ReadLine(), out datum))
                     {
                         Console.WriteLine("Neispravan format datuma.");
