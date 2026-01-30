@@ -48,6 +48,53 @@ namespace Klijent_Gost
             }
         }
 
-       
+        private void UnosDetaljaBoravka(int brojGostiju, int brojNoci)
+        {
+            StanjeGosta.PreostaloNocenja = brojNoci;
+
+            List<Gost> gosti = new List<Gost>();
+            for (int i = 0; i < brojGostiju; i++)
+            {
+                Console.WriteLine($"\nPodaci za gosta #{i + 1}");
+
+                string ime;
+                do
+                {
+                    Console.Write("Ime: ");
+             ole.Write("Datum rodjenja (yyyy-MM-dd): ");
+                    if (!DateTime.TryParse(Console.ReadLine(), out datum))
+                    {
+                        Console.WriteLine("Neispravan format datuma.");
+                        continue;
+                    }
+
+                    if (datum > DateTime.Now.AddYears(-18))
+                    {
+                        Console.WriteLine("Gost mora imati najmanje 18 godina.");
+                        datum = DateTime.MinValue;
+                    }
+
+                } while (datum == DateTime.MinValue);
+
+                string pas;
+                do
+                {
+                    Console.Write("Broj pasosa: ");
+                    pas = Console.ReadLine()?.Trim() ?? "";
+                    if (pas.Length < 6)
+                        Console.WriteLine("Broj pasosa mora imati bar 6 karaktera.");
+                }
+                while (pas.Length < 6);
+
+                gosti.Add(new Gost(0, ime, prezime, pol, datum, pas));
+            }
+
+            StanjeGosta.ImaRezervaciju = true;
+            StanjeGosta.VremeKoriscenaUslugaHotela = DateTime.Now;
+
+            Console.WriteLine("\nRezervacija uspesno kreirana!");
+            Console.WriteLine($"Vas boravak pocinje! Preostalo nocenja: {StanjeGosta.PreostaloNocenja}");
+            Thread.Sleep(2000);
+        }
     }
 }
