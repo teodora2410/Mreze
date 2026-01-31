@@ -23,6 +23,9 @@ namespace Klijent_Gost
                 return;
             }
 
+            Prijavljivanje kontroler = new Prijavljivanje(tcpSocket);
+            kontroler.Pokreni();
+
             tcpSocket.Close();
             Console.WriteLine("\nPritisnite bilo koji taster za izlaz...");
             Console.ReadKey();
