@@ -37,6 +37,15 @@ namespace Server_Aplikacija.Operacije
 
                 byte[] data = new byte[bytes];
                 Array.Copy(buffer, data, bytes);
+
+                try
+                {
+                    PotvrdaOUradjenomZadatku potvrda = MemorySerializer.Deserialize<PotvrdaOUradjenomZadatku>(data);
+                    ObradaPotvrdeOUradjenomZadatku(potvrda);
+                    return;
+                }
+                catch { }
+
                 try
                 {
                     ZahtevKlijenta zahtev = MemorySerializer.Deserialize<ZahtevKlijenta>(data);
