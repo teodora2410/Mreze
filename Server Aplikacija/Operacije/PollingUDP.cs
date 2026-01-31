@@ -21,6 +21,36 @@ namespace Server_Aplikacija.Operacije
             this.apartmani = apartmani;
         }
 
-     
+        public void RunPollingUDP()
+        {
+            if (!udpSocket.Poll(0, SelectMode.SelectRead))
+                return;
+
+            EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+            byte[] buffer = new byte[2048];
+
+            try
+            {
+         
+                try
+                {
+                    ZahtevKlijenta zahtev = MemorySerializer.Deserialize<ZahtevKlijenta>(data);
+                    if (!osobljeUDPKlijenti.Any(c => c.ToString() == ep.ToString()))
+                    {
+                        osobljeUDPKlijenti.Add(ep);
+                        Console.WriteLine($"[UDP] Osoblje registrovano: {ep}");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine($"[UDP] Primljen nepoznat paket od {ep}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Greška UDP] {ex.Message}");
+            }
+        }
+
     }
 }
