@@ -66,5 +66,23 @@ namespace Server_Aplikacija.Operacije
             }
         }
 
+        public void ObradaPotvrdeOUradjenomZadatku(PotvrdaOUradjenomZadatku potvrda)
+        {
+            Apartman a = apartmani.Find(x => x.Id == potvrda.ApartmanId);
+            if (a == null)
+            {
+                Console.WriteLine($"[Greška] Apartman ID {potvrda.ApartmanId} ne postoji");
+                return;
+            }
+
+            if (!potvrda.Uspesno)
+            {
+                Console.WriteLine($"[Potvrda] Zadatak {potvrda.Tip} NIJE uspešno završen za apartman {a.BrojApartmana}");
+                return;
+            }
+
+            Console.WriteLine($"[Potvrda] Zadatak {potvrda.Tip} završen za apartman {a.BrojApartmana}");
+
+        }
     }
 }
