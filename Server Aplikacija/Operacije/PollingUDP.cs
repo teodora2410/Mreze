@@ -31,7 +31,12 @@ namespace Server_Aplikacija.Operacije
 
             try
             {
-         
+                int bytes = udpSocket.ReceiveFrom(buffer, ref ep);
+                if (bytes == 0)
+                    return;
+
+                byte[] data = new byte[bytes];
+                Array.Copy(buffer, data, bytes);
                 try
                 {
                     ZahtevKlijenta zahtev = MemorySerializer.Deserialize<ZahtevKlijenta>(data);
