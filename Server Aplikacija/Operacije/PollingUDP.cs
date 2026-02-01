@@ -83,6 +83,19 @@ namespace Server_Aplikacija.Operacije
 
             Console.WriteLine($"[Potvrda] Zadatak {potvrda.Tip} završen za apartman {a.BrojApartmana}");
 
+            switch (potvrda.Tip)
+            {
+                case TipZadatka.Ciscenje:
+                    a.Stanje = StanjeApartmana.Prazan;
+                    Console.WriteLine($"[Server] Apartman {a.BrojApartmana} - status: SPREMAN");
+                    break;
+
+                case TipZadatka.Minibar:
+                    a.MinibarPun = true;
+                    Console.WriteLine($"[Server] Apartman {a.BrojApartmana} - minibar popunjen");
+                    break;
+
+            }
         }
     }
 }
