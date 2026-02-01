@@ -95,6 +95,10 @@ namespace Server_Aplikacija.Operacije
                     Console.WriteLine($"[Server] Apartman {a.BrojApartmana} - minibar popunjen");
                     break;
 
+                case TipZadatka.Alarm:
+                    a.Alarm = StanjeAlarma.Normalno;
+                    Console.WriteLine($"[Server] Apartman {a.BrojApartmana} - alarm saniran");
+                    break;
             }
         }
     }
