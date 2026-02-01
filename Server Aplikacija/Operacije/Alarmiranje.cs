@@ -35,6 +35,42 @@ namespace Server_Aplikacija.Operacije
             }
         }
 
- 
-       
+        public void PosaljiOsoblje(Apartman apartman, TipZadatka tipZadatka)
+        {
+            }
+
+        public void ObradiPotvrdu(PotvrdaOUradjenomZadatku potvrda)
+        {
+            Apartman apartman = apartmani.Find(x => x.Id == potvrda.ApartmanId);
+
+            if (apartman == null)
+            {
+                Console.WriteLine($"[Greška] Apartman ID {potvrda.ApartmanId} ne postoji");
+                return;
+            }
+
+            if (!potvrda.Uspesno)
+            {
+                Console.WriteLine($"[Server] Zadatak za apartman {apartman.BrojApartmana} NIJE uspešno izvršen");
+                return;
+            }
+
+            switch (potvrda.Tip)
+            {
+                case TipZadatka.Ciscenje:
+                    apartman.Stanje = StanjeApartmana.Zauzet;
+                    Console.WriteLine($"[Server] Apartman {apartman.BrojApartmana} - Čišćenje završeno, status: SPREMAN");
+                    break;
+
+                case TipZadatka.Minibar:
+                    Console.WriteLine($"[Server] Apartman {apartman.BrojApartmana} - Minibar popunjen");
+                    break;
+
+                case TipZadatka.Alarm:
+                    apartman.Alarm = StanjeAlarma.Normalno;
+                    Console.WriteLine($"[Server] Apartman {apartman.BrojApartmana} - Alarm saniran i isključen");
+                    break;
+            }
+        }
+    }
 }
