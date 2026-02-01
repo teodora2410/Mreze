@@ -37,7 +37,20 @@ namespace Server_Aplikacija.Operacije
 
         public void PosaljiOsoblje(Apartman apartman, TipZadatka tipZadatka)
         {
+            if (osobljeUDPKlijenti.Count == 0)
+            {
+                Console.WriteLine("[Server] Nema dostupnog osoblja!");
+                return;
             }
+
+            Zadatak zadatak = new Zadatak(tipZadatka, apartman.Id);
+            byte[] data = MemorySerializer.Serialize(zadatak);
+
+            foreach (var osoblje in osobljeUDPKlijenti)
+                udpSocket.SendTo(data, osoblje);
+
+            Console.WriteLine($"[Server] Zadatak {tipZadatka} poslat osoblju za apartman {apartman.BrojApartmana}");
+        }
 
         public void ObradiPotvrdu(PotvrdaOUradjenomZadatku potvrda)
         {
