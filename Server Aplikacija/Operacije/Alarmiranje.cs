@@ -20,6 +20,21 @@ namespace Server_Aplikacija.Operacije
             this.udpSocket = udpSocket;
         }
 
-     
-    }
+        public void ObradaAlarma(int apartmanId)
+        {
+            Apartman apartman = apartmani.Find(x => x.Id == apartmanId);
+            if (apartman != null)
+            {
+                apartman.Alarm = StanjeAlarma.Aktivirano;
+                Console.WriteLine($"[ALARM] Aktiviran u apartmanu {apartman.BrojApartmana}");
+                PosaljiOsoblje(apartman, TipZadatka.Alarm);
+            }
+            else
+            {
+                Console.WriteLine($"[Greška] Apartman ID {apartmanId} ne postoji");
+            }
+        }
+
+ 
+       
 }
