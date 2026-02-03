@@ -41,7 +41,34 @@ namespace Klijent_Osoblje
 
             while (true)
             {
+                if (udpSocket.Poll(100_000, SelectMode.SelectRead))
+                {
+                    try
+                    {
+                        int bytes = udpSocket.ReceiveFrom(buffer, ref remoteEP);
+                        byte[] data = new byte[bytes];
+                        Array.Copy(buffer, data, bytes);
 
+                        Zadatak zadatak = MemorySerializer.Deserialize<Zadatak>(data);
+                        zadatakBroj++;
+
+                        Console.WriteLine($"{zadatak.Tip} za Apartman {zadatak.ApartmanId}");
+
+                        
+                        }
+
+                        Console.WriteLine("\nZadatak zavrsen\n");
+
+                      
+                    }
+                    catch (SocketException)
+                    {
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Greska: {ex.Message}");
+                    }
+                }
             }
         }
     }
