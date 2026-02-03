@@ -59,7 +59,15 @@ namespace Klijent_Osoblje
 
                         Console.WriteLine("\nZadatak zavrsen\n");
 
-                      
+                        PotvrdaOUradjenomZadatku potvrda = new PotvrdaOUradjenomZadatku
+                        {
+                            ApartmanId = zadatak.ApartmanId,
+                            Tip = zadatak.Tip,
+                            Uspesno = true
+                        };
+
+                        byte[] odgovor = MemorySerializer.Serialize(potvrda);
+                        udpSocket.SendTo(odgovor, serverEP);
                     }
                     catch (SocketException)
                     {
