@@ -54,7 +54,32 @@ namespace Klijent_Osoblje
 
                         Console.WriteLine($"{zadatak.Tip} za Apartman {zadatak.ApartmanId}");
 
-                        
+                        Console.Write("Uradjeno: ");
+                        switch (zadatak.Tip)
+                        {
+                            case TipZadatka.Ciscenje:
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Thread.Sleep(800);
+                                    Console.Write($"{(i + 1) * 33}%  ");
+                                }
+                                break;
+
+                            case TipZadatka.Minibar:
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Thread.Sleep(600);
+                                    Console.Write($"{(i + 1) * 33}%  ");
+                                }
+                                break;
+
+                            case TipZadatka.Alarm:
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Thread.Sleep(1000);
+                                    Console.Write($"{(i + 1) * 50}%   ");
+                                }
+                                break;
                         }
 
                         Console.WriteLine("\nZadatak zavrsen\n");
