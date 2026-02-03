@@ -11,7 +11,12 @@ namespace Klijent_Osoblje
     {
         static void Main(string[] args)
         {
- 
+            Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            udpSocket.Blocking = false;
+
+            EndPoint serverEP = new IPEndPoint(IPAddress.Loopback, 9001);
+            EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
+
          
         }
     }
