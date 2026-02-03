@@ -17,7 +17,32 @@ namespace Klijent_Osoblje
             EndPoint serverEP = new IPEndPoint(IPAddress.Loopback, 9001);
             EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
 
-         
+            try
+            {
+                Console.WriteLine("Dobrodosli u hotelski kompleks!");
+
+                ZahtevKlijenta registracija = new ZahtevKlijenta
+                {
+                    Tip = TipZahteva.StatusSobe,
+                    Payload = "OSOBLJE_REGISTRACIJA"
+                };
+                byte[] data = MemorySerializer.Serialize(registracija);
+                udpSocket.SendTo(data, serverEP);
+
+                Console.WriteLine("Povezano sa serverom.\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Greska pri registraciji: {ex.Message}");
+            }
+
+            byte[] buffer = new byte[4096];
+            int zadatakBroj = 0;
+
+            while (true)
+            {
+
+            }
         }
     }
 }
