@@ -19,6 +19,7 @@ namespace Server_Aplikacija
             List<Apartman> apartmani = new List<Apartman>();
             Dictionary<Socket, RezervacijaInfo> aktivneRezervacije = new Dictionary<Socket, RezervacijaInfo>();
             PollingTCP tcp;
+            PollingUDP udp;
 
             for (int i = 1; i <= 10; i++)
                 apartmani.Add(new Apartman(i, 100 + i, i, i % 3 + 1, i, 0, StanjeApartmana.Prazan, StanjeAlarma.Normalno, new List<int>(), false));
@@ -29,16 +30,22 @@ namespace Server_Aplikacija
             tcpListener.Listen(10);
             tcpListener.Blocking = false;
 
-        
+            // UDP
+            udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            udpSocket.Bind(new IPEndPoint(IPAddress.Any, 9001));
+            udpSocket.Blocking = false;
+
             Console.WriteLine($"[Server]: Inicijalizovano {apartmani.Count} apartmana. Port TCP = 9000, Port UDP = 9001");
 
             ObradaZahteva obradaZahteva = new ObradaZahteva(tcpListener, udpSocket, tcpClients, osobljeUDPKlijenti, apartmani, aktivneRezervacije);
 
             tcp = new PollingTCP(tcpListener, tcpClients, aktivneRezervacije, obradaZahteva, udpSocket, osobljeUDPKlijenti);
+            udp = new PollingUDP(udpSocket, osobljeUDPKlijenti, apartmani);
 
             while (true)
             {
                 tcp.RunPollingTCP();
+                udp.RunPollingUDP();
             }
         }
     }

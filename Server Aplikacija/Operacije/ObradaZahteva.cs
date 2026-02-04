@@ -17,6 +17,10 @@ namespace Server_Aplikacija.Operacije
         List<Apartman> apartmani;
         Dictionary<Socket, RezervacijaInfo> aktivneRezervacije;
 
+        Alarmiranje alarm;
+        Narucivanje narucivanje;
+        Rezervisanje rezervisanje;
+
         public ObradaZahteva(Socket tcpListener, Socket udpSocket, List<Socket> tcpClients, List<EndPoint> osobljeUDPKlijenti, List<Apartman> apartmani, Dictionary<Socket, RezervacijaInfo> aktivneRezervacije)
         {
             this.tcpListener = tcpListener;
@@ -25,6 +29,10 @@ namespace Server_Aplikacija.Operacije
             this.osobljeUDPKlijenti = osobljeUDPKlijenti;
             this.apartmani = apartmani;
             this.aktivneRezervacije = aktivneRezervacije;
+
+            alarm = new Alarmiranje(apartmani, osobljeUDPKlijenti, udpSocket);
+            narucivanje = new Narucivanje(aktivneRezervacije);
+            rezervisanje = new Rezervisanje(apartmani, aktivneRezervacije);
         }
 
         public void ObradaZahtevaKlijenta(Socket klijent, ZahtevKlijenta zahtev)
@@ -38,10 +46,78 @@ namespace Server_Aplikacija.Operacije
                     Console.WriteLine($"[Server] Poslat status soba klijentu ({slobodni.Count} slobodnih)");
                     break;
 
+                case TipZahteva.Rezervacija:
+                    rezervisanje.ObradaRezervacije(klijent, zahtev.Payload);
+                    break;
+
+                case TipZahteva.Alarm:
+                    alarm.ObradaAlarma((int)zahtev.Payload);
+                    break;
+
+                case TipZahteva.Narudzbina:
+                    narucivanje.ObradaNarudzbine(klijent, (string)zahtev.Payload);
+                    break;
+
+                case TipZahteva.KrajBoravka:
+                    PosaljiRacun(klijent);
+                    break;
+
                 default:
                     byte[] data = MemorySerializer.Serialize("Nepoznat tip zahteva");
                     klijent.Send(data);
                     break;
             }
         }
+
+        private void PosaljiRacun(Socket klijent)
+        {
+            if (!aktivneRezervacije.ContainsKey(klijent))
+            {
+                Console.WriteLine("[Greška] Klijent nema aktivnu rezervaciju");
+                return;
+            }
+
+            var info = aktivneRezervacije[klijent];
+
+            double osnovnaCena = info.BrojNoci * 100.0;
+            double troskoviNarudzbina = info.Narudzbine.Count * 50.0;
+            double ukupno = osnovnaCena + troskoviNarudzbina;
+
+            string racun = $"{osnovnaCena}|{troskoviNarudzbina}|{ukupno}|{string.Join(",", info.Narudzbine)}";
+
+            try
+            {
+                byte[] data = MemorySerializer.Serialize(racun);
+                klijent.Send(data);
+                Console.WriteLine($"[Server] Račun poslat gostu - Ukupno: {ukupno:F2} KM");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Greška] Slanje računa: {ex.Message}");
+                return;
+            }
+
+            if (info.Apartman != null)
+            {
+                info.Apartman.TrenutniBrojGostiju = 0;
+                info.Apartman.Stanje = StanjeApartmana.PotrebnoCiscenje;
+                info.Apartman.Gosti.Clear();
+                Console.WriteLine($"[Server] Apartman {info.Apartman.BrojApartmana} oslobođen");
+
+                if (osobljeUDPKlijenti.Count > 0)
+                {
+                    Zadatak zadatak = new Zadatak(TipZadatka.Ciscenje, info.Apartman.Id);
+                    byte[] taskData = MemorySerializer.Serialize(zadatak);
+
+                    foreach (var osoblje in osobljeUDPKlijenti)
+                    {
+                        udpSocket.SendTo(taskData, osoblje);
+                    }
+                    Console.WriteLine($"[Server] Zadatak čišćenja poslat osoblju za apartman {info.Apartman.BrojApartmana}");
+                }
+            }
+
+            aktivneRezervacije.Remove(klijent);
+        }
+    }
 }

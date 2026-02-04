@@ -67,7 +67,26 @@ namespace Klijent_Gost
             }
         }
 
-      
+        private void AktivirajAlarm()
+        {
+            Console.WriteLine("AKTIVACIJA ALARMA");
+            Console.WriteLine("Razlozi za alarm:");
+            Console.WriteLine("  - Problem sa klimom/grejanjem");
+            Console.WriteLine("  - Kvar u kupatilu");
+            Console.WriteLine("  - Problem sa TV/internetom");
+            Console.WriteLine("  - Ostalo");
+
+            ZahtevKlijenta zahtev = new ZahtevKlijenta
+            {
+                Tip = TipZahteva.Alarm,
+                Payload = StanjeGosta.RezervisanApartmanId
+            };
+
+            tcpSocket.Send(MemorySerializer.Serialize(zahtev));
+            Console.WriteLine("\nALARM AKTIVIRAN za Vas apartman!");
+            Console.WriteLine("Osoblje dolazi!");
+            Thread.Sleep(2000);
+        }
 
         public void ZavrsetakBoravka()
         {
@@ -108,6 +127,57 @@ namespace Klijent_Gost
             Thread.Sleep(2000);
         }
 
- 
+        private void PrikaziRacun(string racunStr)
+        {
+            string[] delovi = racunStr.Split('|');
+            if (delovi.Length < 4)
+            {
+                Console.WriteLine("Greska pri obradi racuna.");
+                return;
+            }
+
+            double osnovnaCena = double.Parse(delovi[0]);
+            double troskoviNarudzbina = double.Parse(delovi[1]);
+            double ukupno = double.Parse(delovi[2]);
+            string[] narudzbine = delovi[3].Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray();
+
+            Console.WriteLine("RACUN");
+            Console.WriteLine("------------------------------------");
+            Console.WriteLine($"Smestaj:              {osnovnaCena,10:F2} KM");
+
+            if (narudzbine.Length > 0)
+            {
+                Console.WriteLine("\nNarudzbine:");
+                foreach (var narudzbina in narudzbine)
+                {
+                    Console.WriteLine($"  - {narudzbina}");
+                }
+                Console.WriteLine($"Troskovi narudzbina:  {troskoviNarudzbina,10:F2} KM");
+            }
+
+            Console.WriteLine("------------------------------------");
+            Console.WriteLine($"UKUPNO:               {ukupno,10:F2} KM");
+            Console.WriteLine("------------------------------------");
+
+            PlatiRacun(ukupno);
+        }
+
+        private void PlatiRacun(double iznos)
+        {
+            Console.Write("\nUnesite broj kreditne kartice za placanje: ");
+            string kartica = Console.ReadLine() ?? "";
+
+            if (!string.IsNullOrWhiteSpace(kartica) && kartica.Length >= 10)
+            {
+                Console.WriteLine("\nPlacanje u toku...");
+                Thread.Sleep(1500);
+                Console.WriteLine("Placanje potvrdeno!");
+                Console.WriteLine("Hvala na poverenju! Dobrodosli opet!");
+            }
+            else
+            {
+                Console.WriteLine("\nNevalidan broj kartice - placanje otkazano.");
+            }
+        }
     }
 }

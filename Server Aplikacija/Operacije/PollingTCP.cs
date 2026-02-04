@@ -77,11 +77,14 @@ namespace Server_Aplikacija.Operacije
                     var info = aktivneRezervacije[d];
                     if (info.Apartman != null)
                     {
+                        PosaljiRacun(d, info);
+
                         info.Apartman.TrenutniBrojGostiju = 0;
                         info.Apartman.Stanje = StanjeApartmana.PotrebnoCiscenje;
                         info.Apartman.Gosti.Clear();
                         Console.WriteLine($"[Server] Apartman {info.Apartman.BrojApartmana} oslobođen");
 
+                        PosaljiZadatakCiscenja(info.Apartman);
                     }
                     aktivneRezervacije.Remove(d);
                 }
@@ -90,6 +93,43 @@ namespace Server_Aplikacija.Operacije
             }
         }
 
-       
+        private void PosaljiRacun(Socket klijent, RezervacijaInfo info)
+        {
+            double osnovnaCena = info.BrojNoci * 100.0;
+            double troskoviNarudzbina = info.Narudzbine.Count * 50.0;
+            double ukupno = osnovnaCena + troskoviNarudzbina;
+
+            string racun = $"{osnovnaCena}|{troskoviNarudzbina}|{ukupno}|{string.Join(",", info.Narudzbine)}";
+
+            try
+            {
+                byte[] data = MemorySerializer.Serialize(racun);
+                klijent.Send(data);
+                Console.WriteLine($"[Server] Račun poslat gostu - Ukupno: {ukupno:F2} KM");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Greška] Slanje računa: {ex.Message}");
+            }
+        }
+
+        private void PosaljiZadatakCiscenja(Apartman apartman)
+        {
+            if (osobljeUDPKlijenti.Count == 0)
+            {
+                Console.WriteLine("[Server] Nema dostupnog osoblja za čišćenje");
+                return;
+            }
+
+            Zadatak zadatak = new Zadatak(TipZadatka.Ciscenje, apartman.Id);
+            byte[] data = MemorySerializer.Serialize(zadatak);
+
+            foreach (var osoblje in osobljeUDPKlijenti)
+            {
+                udpSocket.SendTo(data, osoblje);
+            }
+
+            Console.WriteLine($"[Server] Zadatak čišćenja poslat osoblju za apartman {apartman.BrojApartmana}");
+        }
     }
 }
