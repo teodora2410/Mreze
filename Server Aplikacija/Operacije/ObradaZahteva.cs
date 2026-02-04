@@ -104,7 +104,17 @@ namespace Server_Aplikacija.Operacije
                 info.Apartman.Gosti.Clear();
                 Console.WriteLine($"[Server] Apartman {info.Apartman.BrojApartmana} oslobođen");
 
-              
+                if (osobljeUDPKlijenti.Count > 0)
+                {
+                    Zadatak zadatak = new Zadatak(TipZadatka.Ciscenje, info.Apartman.Id);
+                    byte[] taskData = MemorySerializer.Serialize(zadatak);
+
+                    foreach (var osoblje in osobljeUDPKlijenti)
+                    {
+                        udpSocket.SendTo(taskData, osoblje);
+                    }
+                    Console.WriteLine($"[Server] Zadatak čišćenja poslat osoblju za apartman {info.Apartman.BrojApartmana}");
+                }
             }
 
             aktivneRezervacije.Remove(klijent);
