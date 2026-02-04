@@ -22,20 +22,12 @@ namespace Klijent_Gost
         public void PrikaziMeniTokomBoravka()
         {
             TimeSpan protekloVreme = DateTime.Now - StanjeGosta.VremeKoriscenaUslugaHotela;
-            if (protekloVreme.TotalSeconds >= 10)
+            if (protekloVreme.TotalSeconds >= 5)
             {
                 StanjeGosta.PreostaloNocenja--;
                 StanjeGosta.VremeKoriscenaUslugaHotela = DateTime.Now;
 
-                if (StanjeGosta.PreostaloNocenja > 0)
-                {
-                    Console.WriteLine($"\nProsao je dan! Preostalo nocenja: {StanjeGosta.PreostaloNocenja}");
-                }
-                else
-                {
-                    Console.WriteLine($"\nVas boravak je zavrsen!");
-                    return;
-                }
+               
             }
 
             Console.WriteLine("\nINFORMACIJE O BORAVKU");
@@ -52,13 +44,10 @@ namespace Klijent_Gost
                 case "1":
                     narudzbina.PosaljiNarudzbinu("hrana/pice");
                     break;
-
-                case "2":
-                    narudzbina.PosaljiNarudzbinu("rekreacija");
-                    break;
-
                 case "3":
                     AktivirajAlarm();
+                    break;
+  case "2": narudzbina.PosaljiNarudzbinu("rekreacija");
                     break;
 
                 default:
